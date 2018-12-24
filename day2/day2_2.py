@@ -26,12 +26,14 @@ for idx in range(len(data)):
 def remove_idx_from_string(s, idx):
     return s[:idx] + s[idx+1:]
 
-s = a1
-for x in range(len(diffpos)):
-    s = remove_idx_from_string(s, diffpos.pop())
-
 # print results
 print(a1)
 print(a2)
 print(diffpos)
+
+s = a1
+for x in range(len(diffpos)):
+    s = remove_idx_from_string(s, diffpos.pop())
+
+
 print(s)
