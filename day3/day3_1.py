@@ -33,3 +33,19 @@ num_overlap = (arr > 1).nonzero()[0].shape[0]
 print("Overlapping segments: %d" % num_overlap)
 
 #################### part 2 ########################
+
+# if cut doesn't overlap any other, all indeces should be 1 for that slice
+def check_array_slice(a, cut_list):
+    col_start = cut_list[1]
+    row_start = cut_list[2]
+    col_size = cut_list[3]
+    row_size = cut_list[4]
+    col_end = col_start+col_size
+    row_end = row_start+row_size
+    
+    return np.array_equal(a[row_start:row_end, col_start:col_end], np.ones([row_size, col_size], dtype=int))
+
+for c in cuts:
+    if check_array_slice(arr, c):
+        print("Index %d doesn't overlap with any other" % c[0])
+        break
