@@ -14,23 +14,29 @@ def is_opposite_case(a1, a2):
     else:
         return (is_lower(a1) and is_upper(a2)) or (is_upper(a1) and is_lower(a2))
 
+def delete_idxs_from_list(l, idxs):
+    for idx in sorted(idxs, reverse=True):
+        del l[idx]
+    return l
+
 # convert to list
 l = [c for c in s]
-n = 0
-while True:
-    # count polymer reactions in pass. Once none are destroyed in a pass, finish
-    poly_destroyed = False
-    for idx in range(len(l)-1):
-        c1 = l[idx]
-        c2 = l[idx+1]
-        if is_opposite_case(c1, c2):
-            #print("c1 = %s, c2 = %s, deleting %s" % (c1, c2, l[idx:idx+2]))
-            del l[idx:idx+2]
-            poly_destroyed = True
-            break
-        
-    if poly_destroyed:
-        continue
+
+# loop over list, checking pairs
+idxs_to_delete = []
+idx = 0
+while idx < len(l)-1:
+    # mark indeces of pair matches
+    c1 = l[idx]
+    c2 = l[idx+1]
+    if is_opposite_case(c1, c2):
+        # print("%d) c1 = %s, c2 = %s, deleting %s" % (idx, c1, c2, l[idx:idx+2]))
+        idxs_to_delete.extend([idx, idx+1])
+        idx += 2
+    else:
+        idx += 1
+
+l = delete_idxs_from_list(l, idxs_to_delete)
 
 s_reduced = str.join('',l)
 print(s_reduced)
