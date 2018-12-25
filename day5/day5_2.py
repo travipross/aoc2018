@@ -1,4 +1,5 @@
 import time
+from collections import Counter
 
 t1 = time.time()
 with open('data5.txt') as f:
@@ -23,29 +24,40 @@ def delete_idxs_from_list(l, idxs):
     return l
 
 # convert to list
-l = [c for c in s]
+l1 = [c for c in s]
 
-# loop over list, checking pairs
-n = 0
-while True:
-    idxs_to_delete = []
-    idx = 0
-    while idx < len(l)-1:
-        # mark indeces of pair matches
-        c1 = l[idx]
-        c2 = l[idx+1]
-        if is_opposite_case(c1, c2):
-            # print("%d) c1 = %s, c2 = %s, deleting %s" % (idx, c1, c2, l[idx:idx+2]))
-            idxs_to_delete.extend([idx, idx+1])
-            idx += 2
-        else:
-            idx += 1
-    if not idxs_to_delete: # empty
-        break
-    l = delete_idxs_from_list(l, idxs_to_delete)
-    n += 1
-    
-s_reduced = str.join('',l)
+c = Counter(s.lower())
+
+len_to_beat = 1e9
+letter_to_beat = ''
+for letter in c.keys():
+    l = [c for c in l1 if c.lower()!=letter] # remove all traces of letter
+    # loop over list, checking pairs
+    n = 0
+    while True:
+        idxs_to_delete = []
+        idx = 0
+        while idx < len(l)-1:
+            # mark indeces of pair matches
+            c1 = l[idx]
+            c2 = l[idx+1]
+            if is_opposite_case(c1, c2):
+                # print("%d) c1 = %s, c2 = %s, deleting %s" % (idx, c1, c2, l[idx:idx+2]))
+                idxs_to_delete.extend([idx, idx+1])
+                idx += 2
+            else:
+                idx += 1
+        if not idxs_to_delete: # empty
+            break
+        l = delete_idxs_from_list(l, idxs_to_delete)
+        n += 1
+        
+    s_reduced = str.join('',l)
+    if len(s_reduced) < len_to_beat:
+        len_to_beat = len(s_reduced)
+        letter_to_beat = letter
+        print("new favourite: %s=%d" % (letter_to_beat, len_to_beat))
+
 t2 = time.time()
 print(s_reduced)
 print("len: %d" % len(s_reduced))
