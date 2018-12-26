@@ -1,9 +1,10 @@
 import re
+import copy
 from itertools import chain
 from collections import defaultdict
 
 # read file
-with open('data7_test.txt') as f:
+with open('data7.txt') as f:
     raw = f.read()
 
 # parse the data
@@ -14,7 +15,7 @@ steps = re.findall(pattern, raw)
 pr = defaultdict(list)
 for step in steps:
     pr[step[1]].append(step[0])
-
+pr_copy = copy.deepcopy(pr)
 
 # create helper function to remove items from prerequisites
 def perform_step(s, pr):
@@ -30,7 +31,7 @@ def perform_step(s, pr):
 
 
 # while any pre-requisites exist, continue performing steps
-steps_performed = ''
+step_order = ''
 while pr:
     # any item in set of prerequisites that's not in set of keys is ready to be done
     s_keys = set(pr.keys())
@@ -44,38 +45,51 @@ while pr:
         step_to_do = sorted(prs_ready_to_be_done)[0]
 
     perform_step(step_to_do, pr)
-    steps_performed += step_to_do
+    step_order += step_to_do
     # print("Performed step %s" % step_to_do)
 
 # the last item in keys is the last step to perform
-steps_performed += s_keys.pop()
-print(steps_performed)
+step_order += s_keys.pop()
+print(step_order)
 
 # not BOJYAKESNGTWMXFZQVRDHIULP
 # answer JNOIKSYABEQRUVWXGTZFDMHLPC
 
 
 ########### part 2 ##################
-n_workers = 2
-bias = ord('A') - 1
-times = [ord(x)-bias for x in steps_performed]
+n_workers = 5
 
-step_times = dict(zip(steps_performed, times))
-remaining_steps = list(steps_performed)
-workers = [0]*n_workers
+backlog = list(step_order)
+in_progress = dict()
+complete = set()
+
+bias = ord('A') - 61
+times = dict(zip(backlog, [ord(x)-bias for x in step_order]))
+
+
+def prerequisites_complete(step, pr, done):
+    return set(pr.get(step, [])).issubset(set(done))
+
 elapsed = 0
-while True:
-    # if steps left, try to assign to any available workers ( no time)
-    if remaining_steps:
-        for idx, w in enumerate(workers):
-            if w == 0 and remaining_steps:
-                workers[idx] = step_times.get(remaining_steps.pop(0))
-                continue
-
-    else:
-        if not any(workers):
-            break
+while len(backlog) or len(in_progress):
+    # for every step that's ready to be done, begin action
+    if len(in_progress) < n_workers:
+        for idx, s in enumerate(backlog):
+            if prerequisites_complete(s, pr_copy, complete):
+                in_progress.update({s: times[s]})
+                del backlog[idx]
+    print(elapsed, in_progress)
+    # for every item in progress, update time (and complete if necessary)
+    keys_to_delete = []
+    for k,v in in_progress.items():
+        in_progress[k] = v - 1
+        if in_progress[k] == 0:
+            complete.add(k)
+            keys_to_delete.append(k)
+    for k in keys_to_delete:
+        del in_progress[k]
     elapsed += 1
-    workers = [w-1 if w > 0 else 0 for w in workers]
+
 
 print(elapsed)
+
