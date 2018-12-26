@@ -3,7 +3,7 @@ from itertools import chain
 from collections import defaultdict
 
 # read file
-with open('data7.txt') as f:
+with open('data7_test.txt') as f:
     raw = f.read()
 
 # parse the data
@@ -45,11 +45,37 @@ while pr:
 
     perform_step(step_to_do, pr)
     steps_performed += step_to_do
-    print("Performed step %s" % step_to_do)
+    # print("Performed step %s" % step_to_do)
 
 # the last item in keys is the last step to perform
 steps_performed += s_keys.pop()
 print(steps_performed)
 
 # not BOJYAKESNGTWMXFZQVRDHIULP
+# answer JNOIKSYABEQRUVWXGTZFDMHLPC
 
+
+########### part 2 ##################
+n_workers = 2
+bias = ord('A') - 1
+times = [ord(x)-bias for x in steps_performed]
+
+step_times = dict(zip(steps_performed, times))
+remaining_steps = list(steps_performed)
+workers = [0]*n_workers
+elapsed = 0
+while True:
+    # if steps left, try to assign to any available workers ( no time)
+    if remaining_steps:
+        for idx, w in enumerate(workers):
+            if w == 0 and remaining_steps:
+                workers[idx] = step_times.get(remaining_steps.pop(0))
+                continue
+
+    else:
+        if not any(workers):
+            break
+    elapsed += 1
+    workers = [w-1 if w > 0 else 0 for w in workers]
+
+print(elapsed)
