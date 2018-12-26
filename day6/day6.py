@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 # read data into list of tuples
 coords = []
@@ -14,8 +14,8 @@ def manhattan_dist(c1, c2):
 # helper function for finding closest coordinate. returns idx or None if tied
 def find_closest_coord(pt, coords):
     duplicate_found = False
+    d_min = 1e9
     for idx, c in enumerate(coords):
-        d_min=1e9
         d = manhattan_dist(pt, c)
         if d < d_min:
             d_min = d
@@ -24,7 +24,7 @@ def find_closest_coord(pt, coords):
         elif d == d_min:
             duplicate_found = True
 
-    return idx if not duplicate_found else None
+    return idx_min if not duplicate_found else 'tied'
 
 
 row_coords = [c[0] for c in coords]
@@ -73,3 +73,15 @@ areas = defaultdict(int)
 
 for r in range(inner_limits[0], inner_limits[1]+1):
     for c in range(inner_limits[2], inner_limits[3]+1):
+        idx = find_closest_coord((r, c), coords)
+        areas[idx] += 1
+
+ctr = Counter(areas)
+
+for idx, ct in ctr.most_common():
+    loneliest_coord = coords[idx]
+    if loneliest_coord not in inf_coords:
+        break
+
+print(loneliest_coord)
+print(ct)
