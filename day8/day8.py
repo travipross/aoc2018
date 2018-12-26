@@ -13,15 +13,21 @@ def parse(data):
 
     # recursively add totals from child nodes
     totals = 0
+    values = []
     for i in range(children):
         # recursive step
-        total, data = parse(data)
+        total, data, value = parse(data)
         totals += total
+        values.append(value) # values is a list of child values
 
     # add totals from current node
     totals += sum(data[:metas])
+    if children == 0:
+        out_value = sum(data[:metas])
+    else:
+        out_value = sum(values[k-1] for k in data[:metas] if 0 < k <= len(values))
 
-    return totals, data[metas:]
+    return totals, data[metas:], out_value
 
 
-print(parse(data)[0])
+print(parse(data))
