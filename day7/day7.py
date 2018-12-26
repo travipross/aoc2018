@@ -1,4 +1,5 @@
 import re
+from itertools import chain
 from collections import defaultdict
 
 # read file
@@ -12,9 +13,7 @@ steps = re.findall(pattern, raw)
 # build data structure to indicate prerequisites
 pr = defaultdict(list)
 for step in steps:
-    before = step[0]
-    after = step[1]
-    pr[after].append(before)
+    pr[step[1]].append(step[0])
 
 
 # create helper function to remove items from prerequisites
@@ -30,19 +29,27 @@ def perform_step(s, pr):
         del pr[key]
 
 
-# look for any step having only one pre-requisite
+# while any pre-requisites exist, continue performing steps
 steps_performed = ''
 while pr:
-    possible_steps = [p[0] for p in pr.values() if len(p) == 1]
-    # if no possible steps are found, there must be an error
-    if not possible_steps:
+    # any item in set of prerequisites that's not in set of keys is ready to be done
+    s_keys = set(pr.keys())
+    s_vals = set(chain.from_iterable(pr.values()))
+    prs_ready_to_be_done = sorted(list(set.difference(s_vals, s_keys)))
+
+    # determine what step to do next
+    if not prs_ready_to_be_done:
         raise IndexError('No possible steps remain')
+    else:
+        step_to_do = sorted(prs_ready_to_be_done)[0]
 
-    step_to_do = sorted(possible_steps)[0]
-    steps_performed += step_to_do
     perform_step(step_to_do, pr)
+    steps_performed += step_to_do
+    print("Performed step %s" % step_to_do)
 
+# the last item in keys is the last step to perform
+steps_performed += s_keys.pop()
 print(steps_performed)
 
-
+# not BOJYAKESNGTWMXFZQVRDHIULP
 
